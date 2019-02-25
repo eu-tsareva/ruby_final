@@ -12,7 +12,11 @@ class Card
   def value
     return rank if rank.is_a?(Integer)
 
-    rank == 'A' ? 1 : 10
+    ace? ? 1 : 10
+  end
+
+  def ace?
+    rank == 'A'
   end
 
   def to_s
