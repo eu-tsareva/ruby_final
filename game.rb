@@ -1,5 +1,5 @@
 class Game
-  ACCOUNT = 100
+  ACCOUNT = 30
   BID_SIZE = 10
   MAX_SCORE = 21
   MOVES = {
@@ -56,7 +56,6 @@ class Game
   end
 
   def print_move(move)
-    puts move
     puts "#{active.name}'s move: #{MOVES[move].downcase}\n\n"
   end
 

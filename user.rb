@@ -10,10 +10,16 @@ class User < Player
   def choose_move
     return if moves.empty? || cards.empty?
 
+    print_moves
+    move = moves.keys[gets.chomp.to_i - 1]
+    moves.delete(move)
+    move
+  end
+
+  private
+
+  def print_moves
     puts "\nChoose your next move:"
     moves.values.each.with_index(1) { |val, i| puts "#{i}. #{val}" }
-    move = moves.keys[gets.chomp.to_i - 1]
-    moves.reject! { |k, _| k == move }
-    move
   end
 end

@@ -16,10 +16,12 @@ loop do
     game.finish
     break unless game.continue?
 
-    puts "#{name}, would you like to play again? (y/n)"
-    break if gets.chomp == 'n'
+    puts "#{name}, would you like to play again? (print 'no' to exit)"
+    break if gets.chomp == 'no'
   end
-  puts "One of the players has no money"
-  puts "#{name}, would you like to restart? (y/n)"
-  break if gets.chomp == 'n'
+  break if game.continue?
+
+  puts 'One of the players has no money'
+  puts "#{name}, would you like to restart? (print 'no' to exit)"
+  break if gets.chomp == 'no'
 end

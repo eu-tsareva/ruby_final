@@ -1,6 +1,6 @@
 class Card
   RANKS = (2..10).to_a + %w[J Q K A]
-  SUITS = ["\u2666", "\u2665", "\u2663", "\u2660"]
+  SUITS = ["\u2666", "\u2665", "\u2663", "\u2660"].freeze
 
   attr_reader :suit, :rank
 
