@@ -1,7 +1,12 @@
 class Dealer < Player
   def initialize(name: 'dealer', account:, bid_size:)
     super
-    @moves = %i[pass take_card open_cards]
+  end
+
+  def start_game(cards)
+    self.moves = Game::MOVES.keys
+    self.cards = cards
+    bid
   end
 
   def choose_move
@@ -14,5 +19,9 @@ class Dealer < Player
         :take_card
       end
     moves.delete(move)
+  end
+
+  def show_cards
+    "\u2592 " * cards.size
   end
 end
