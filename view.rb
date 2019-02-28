@@ -5,8 +5,12 @@ class View
   end
 
   def move(moves)
-    print_moves moves
-    index = move_index while index.nil? || moves[index].nil?
+    index = nil
+    loop do
+      print_moves moves
+      index = move_index
+      break if index.between?(0, moves.size - 1)
+    end
     index
   end
 
