@@ -1,5 +1,5 @@
 class Game
-  ACCOUNT = 30
+  ACCOUNT = 100
   BID_SIZE = 10
   MAX_SCORE = 21
   MOVES = {
@@ -8,8 +8,10 @@ class Game
     open_cards: 'Show cards'
   }.freeze
 
-  def initialize(user_name)
-    @user = User.new(name: user_name, account: ACCOUNT, bid_size: BID_SIZE)
+  def initialize
+    @view = View.new
+    @name = @view.name
+    @user = User.new(name: @name, account: ACCOUNT, bid_size: BID_SIZE)
     @dealer = Dealer.new(account: ACCOUNT, bid_size: BID_SIZE)
   end
 
@@ -17,18 +19,19 @@ class Game
     @deck = Deck.new
     @status = true
     @bank = 0
-    [user, dealer].each do |player|
+    players.each do |player|
       player.start_game(deck.deal_two)
       @bank += BID_SIZE
     end
     self.active = user
+    view.print_greeting
   end
 
   def play
-    print_info
-    move = active.choose_move while move.nil?
-    print_move move
-    make_move move
+    view.print_info(players, bank)
+    move = active.move(view)
+    view.print_move(active, MOVES[move].downcase)
+    make_move(move)
   end
 
   def on?
@@ -36,40 +39,29 @@ class Game
   end
 
   def finish
-    print_scores
+    view.print_scores(players)
     divide_bank
   end
 
-  def continue?
-    [user, dealer].none?(&:broke?)
+  def continuable?
+    players.none?(&:broke?)
+  end
+
+  def replay?
+    view.replay?(name)
+  end
+
+  def restart?
+    view.restart?(name)
   end
 
   private
 
   attr_accessor :active, :status
-  attr_reader :user, :dealer, :deck, :bank
+  attr_reader :user, :dealer, :deck, :bank, :view, :name
 
-  def print_info
-    puts format('%20s', "bank: #{@bank}$")
-    puts format('%-20s %-20s', user.info, dealer.info)
-    puts format('%-20s %-20s', user.show_cards, dealer.show_cards)
-  end
-
-  def print_move(move)
-    puts "#{active.name}'s move: #{MOVES[move].downcase}\n\n"
-  end
-
-  def print_scores
-    puts format('%20s', 'Show cards!')
-    puts format('%-20s %-20s', user.open_cards, dealer.open_cards)
-    puts format('%-20s %-20s', user.score, dealer.score)
-  end
-
-  def print_winners(winners, win)
-    puts '------------------------------'
-    puts "Winner(s): #{winners.map(&:name).join(',')}"
-    puts "The win is #{win}$"
-    puts '------------------------------'
+  def players
+    [user, dealer]
   end
 
   def make_move(move)
@@ -100,19 +92,17 @@ class Game
   def divide_bank
     w_players = winners
     win = bank / w_players.size
-    print_winners(w_players, win)
+    view.print_winners(w_players, win)
     w_players.each { |winner| winner.win(win) }
   end
 
   def winners
-    players = [user, dealer]
+    w_players = []
     user_score = user.score
     dealer_score = dealer.score
-    return players if user_score == dealer_score
-
-    players.delete(dealer) if looser(dealer_score, user_score)
-    players.delete(user) if looser(user_score, dealer_score)
-    players
+    w_players << dealer unless looser(dealer_score, user_score)
+    w_players << user unless looser(user_score, dealer_score)
+    w_players.empty? ? players : w_players
   end
 
   def looser(player_score, opponent_score)

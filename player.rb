@@ -8,6 +8,12 @@ class Player
     @cards = []
   end
 
+  def start_game(cards)
+    self.moves = {}.merge Game::MOVES
+    self.cards = cards
+    bid
+  end
+
   def info
     "#{name} (#{@account}$)"
   end
@@ -28,6 +34,14 @@ class Player
     cards << card
   end
 
+  def move(view)
+    return if moves.empty? || cards.empty?
+
+    move = choose_move(view)
+    moves.delete(move)
+    move
+  end
+
   def score
     sum = cards.sum(&:value)
     cards.none?(&:ace?) || sum > 11 ? sum : sum + 10
@@ -43,6 +57,10 @@ class Player
 
   def moves?
     moves.size > 1
+  end
+
+  def moves_availiable
+    moves.values
   end
 
   protected
